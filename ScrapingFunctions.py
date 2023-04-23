@@ -10,12 +10,12 @@ def GenerateDates(initial_year = 2023):
     # 2024 sets it so the final date is 2023-03-31
     for year in range(2024 - (initial_year)):
         year = initial_year + year
-        for month in range(1):
+        for month in range(5):
             # Nov 1st to March 31st if range = 5
             # Function for doing the proper month with switch statement ie 11 - 03
             month = MonthCheck(month)
             #31 days for range unless testing
-            for day in range(1):
+            for day in range(31):
                 day = DayCheck(day)
                 dateMatrix.append(str(YearCheck(year, month)) + '-' + str(month) + '-' + str(day))
     DateArray = dateMatrix
@@ -24,12 +24,14 @@ def GenerateDates(initial_year = 2023):
 def ScrapingSched(url, gameList, dates): 
     for YMD in dates:
         urlDate = url + str(YMD)
+        print(YMD)
         page = rq.get(urlDate).text
         soup = bs(page,features="html.parser")
 
         # Takes the url info and puts it into a Python object (ListOfGames) --- works because there is only one table and this is the first
         table = soup.find('table')
         ListOfGames = []
+        
         for row in table.find_all('tr')[1:]:
             temp = row.text.replace('\n\n', ' ').strip()
             temp_list = temp.split('\n')
@@ -40,12 +42,21 @@ def ScrapingSched(url, gameList, dates):
         # For loop that goes through the table contents of the scraped data and sending it into a dictionary -> gameList
         for gameTitle in ListOfGames:
             firstGame = gameTitle
-            abridgedIdx = firstGame.index(' at')
-            homeTeam = firstGame[abridgedIdx+8:]
-            awayTeam = firstGame[3:abridgedIdx-1]
-            gameList['Home'].append(homeTeam.strip())
-            gameList['Away'].append(awayTeam.strip())
-            gameList['Year-Month-Day'].append(YMD)
+            #print(firstGame) for troubleshooting
+            if ' at' in firstGame:
+                abridgedIdx = firstGame.index(' at')
+                homeTeam = firstGame[abridgedIdx+8:]
+                awayTeam = firstGame[3:abridgedIdx-1]
+                gameList['Home'].append(homeTeam.strip())
+                gameList['Away'].append(awayTeam.strip())
+                gameList['Year-Month-Day'].append(YMD)
+            elif ' vs.' in firstGame:
+                abridgedIdx = firstGame.index(' vs.')
+                homeTeam = firstGame[abridgedIdx+9:]
+                awayTeam = firstGame[3:abridgedIdx-1]
+                gameList['Home'].append(homeTeam.strip())
+                gameList['Away'].append(awayTeam.strip())
+                gameList['Year-Month-Day'].append(YMD)
 
     return gameList
 
@@ -79,21 +90,3 @@ def DateConverterToURL (date):
     # year-month-day  ---->  month=04&day=8&year=2023
     ScoreDate = 'month=' + str(int(date[5:7])) + '&day=' + str(int(date[8:10])) + '&year=' + str(date[0:4])
     return str(ScoreDate)
-
-
-def FindScore(homeTeam, awayTeam, date, scoreList, i):
-    baseScoreUrl = 'https://www.basketball-reference.com/boxscores/?'
-    ScoreUrl = baseScoreUrl + DateConverterToURL(date)
-    page = rq.get(ScoreUrl).text
-    soup = bs(page,features="html.parser")
-    table = soup.find('table')
-    inner = [item.text for item in soup.find_all('td')]
-    if homeTeam == 'Okla City':
-        homeTeam = 'Oklahoma City'
-    tempidx = inner.index(homeTeam)
-    scoreList[i][0] = int(inner[tempidx+1])
-    if awayTeam == 'Okla City':
-        awayTeam = 'Oklahoma City'
-    tempidx = inner.index(awayTeam)
-    scoreList[i][1] = int(inner[tempidx+1])
-    return scoreList
