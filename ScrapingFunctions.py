@@ -4,7 +4,6 @@ import requests as rq
 # This includes the functions used for pulling the games played at each date and putting them into a dict that has HOME/AWAY/DATE
 # Potential issue when 14-15 season and the seasons prior do not include the power rankings so the string splicing needs to be different
 # 2016 is the most number of data we can do if we do not fix the splicing issue
-
 def GenerateDates(initial_year = 2023): 
     dateMatrix = []
     # 2024 sets it so the final date is 2023-03-31
@@ -21,6 +20,7 @@ def GenerateDates(initial_year = 2023):
     DateArray = dateMatrix
     return DateArray
 
+# Searches the site for each game played in the given date that is inputted into it
 def ScrapingSched(url, gameList, dates): 
     for YMD in dates:
         urlDate = url + str(YMD)
@@ -60,6 +60,7 @@ def ScrapingSched(url, gameList, dates):
 
     return gameList
 
+# Converts the day generation into the form that the URL accepts it in
 def DayCheck(day):
     day = day + 1
     if day < 10:
@@ -67,6 +68,7 @@ def DayCheck(day):
         return day
     return str(day)
 
+# Converts month generation into the form that the URL accepts it in
 def MonthCheck(month):
     if month == 0:
         return '11'
@@ -79,6 +81,7 @@ def MonthCheck(month):
     elif month == 4:
         return '03'
 
+# Ensures that the years for a given date are correct
 def YearCheck(year, month):
     if (int(month) == 11 or int(month) == 12):
         year = int(year) - 1
@@ -86,6 +89,7 @@ def YearCheck(year, month):
     else:
         return str(year)
 
+# Converts the dates so they are in the correct format for a given cites url structure
 def DateConverterToURL (date):
     # year-month-day  ---->  month=04&day=8&year=2023
     ScoreDate = 'month=' + str(int(date[5:7])) + '&day=' + str(int(date[8:10])) + '&year=' + str(date[0:4])

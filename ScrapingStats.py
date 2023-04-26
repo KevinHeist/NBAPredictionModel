@@ -22,13 +22,19 @@ def StatScrape(home = '', away = '', i = 0, TeamStats = [], url = '', date = '')
     
     # Takes the url info and puts it into a Python object (ListOfGames) --- works because there is only one table and this is the first
     table = soup.find('table')
-    #print('Empty Array:',TeamStats) #Gives an array of len of teams (rows) and 3 cols
+
     #stats after the team name: year / last 3 / last 1 / home / away
     inner = [item.text for item in soup.find_all('td')]
     # Last 3 then home/away do home team stats first then away
     # if it is a string or percentage it must be int()
     tempidx = inner.index(home)
     print(inner)
+    # if statements including '--' are to combat there being empty stats on certain days given it being 
+    # early in the season
+
+    # inner[tempidx+2] = Last 3 games stat
+    # inner[tempidx+4] = stats at home for the home team
+    # inner[tempidx+5] = stats while away for the away team
     if inner[tempidx+4] == '--':
             inner[tempidx+4] = inner[tempidx+1]
     if inner[tempidx+2] == '--':

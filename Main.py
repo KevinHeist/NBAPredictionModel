@@ -7,22 +7,20 @@ import pandas as pd
 import time
 from reader import feed
 
+# Links to stats used
 offEffURL = 'https://www.teamrankings.com/nba/stat/offensive-efficiency?date='
 defEffURL = 'https://www.teamrankings.com/nba/stat/defensive-efficiency?date='
 assToTOURL = 'https://www.teamrankings.com/nba/stat/assist--per--turnover-ratio?date='
 effFGPercURL = 'https://www.teamrankings.com/nba/stat/effective-field-goal-pct?date='
 opEffFGPercURL = 'https://www.teamrankings.com/nba/stat/opponent-effective-field-goal-pct?date='
 
+# Link to to URL used for the score
 baseScoreUrl = 'https://www.basketball-reference.com/boxscores/?'
 
+# Bank of the URLs used for stats collection
 URLBank = [offEffURL, defEffURL, assToTOURL, effFGPercURL, opEffFGPercURL]
 
-# Will go November 1st till April 1st
-# 15-16 seasons onward include the power ranking ie: #3 Philadelphia
-# Therefore must add something that will do another splicing method for the earlier years
-# If there was not an nba game there is no output added to the dictionary -> no error
-# Also if there is an invalid game ie 2/31/23 it will output nothing to the dictionary -> no error
-
+# URL used to generate team schedule
 url = 'https://www.teamrankings.com/nba/schedules/?date=' 
 
 # Beginning of data collection ie 2023 would be begin at 2022-11-01 -> 2023 2023-03-31
@@ -32,12 +30,11 @@ DateMatrix = GenerateDates(2016)
 #print(DateMatrix)
 print('Date generation complete')
 
+# Dataframe of the generated dates
 DFDates = pd.DataFrame(DateMatrix)
-# # save the dataframe as a csv file
-#DFDates.to_csv("DatesDF.csv")
 
+# Used to see what teams play on what days
 GameHistory = {'Home': [], 'Away': [], 'Year-Month-Day': []}
-
 # Function creating 
 print('Using date matrix to find each game on each generated day')
 ScrapingSched(url, GameHistory, DateMatrix)
@@ -49,14 +46,11 @@ DFGames = pd.DataFrame(GameHistory)
 # save the dataframe as a csv file
 #DFGames.to_csv("GameListDF.csv")
 
-#print(GameHistory) 
-
-# How to print each particular element 
-# print(GameHistory['Home'][2], GameHistory['Away'][2], GameHistory['Year-Month-Day'][2])
-
-# Makes zero array of the correct length given the amount of teams 
+# Makes zero array of the correct length given the amount of teams
+# Will be used for collecting the stats each day the team plays 
 TeamStats = np.zeros((len(GameHistory['Home'][:]),20))
 
+# Calls the game list dict 
 dfGamesList = pd.read_csv('GameListDF.csv')
 i = range(len(dfGamesList['Home']))
 
@@ -74,20 +68,10 @@ for j in i:
 print('Finished')
 print('===== Finished with Stat Collections =====')
 
+# Saves team stats DF
 DFStats = pd.DataFrame(TeamStats)
+# Was done partially in jupiter so TeamStatsDF is not full, look for TeamStatsDFFinalRevising for full
 #DFStats.to_csv("TeamStatsDF.csv")
 
+# Stats Matrix Structure
 # Home Team ( OffEff(L3/Home), DefEff(L3/Home), AsToTO(L3/Home), EffFg%(L3/Home), OpEff(L3/Home), then same thing for Away Team )
-#print(TeamStats)
-
-
-# Gives the final scores from the dates in the dict format of Home/Away
-print("------ Finding Scores for Specified Teams --------")
-
-print('+++++ Final Scores Have Been Generated +++++')
-
- 
-# convert array into dataframe
-#DFScores = pd.DataFrame(finalScores)
-# save the dataframe as a csv file
-#DFScores.to_csv("FinalScoresDF.csv")
